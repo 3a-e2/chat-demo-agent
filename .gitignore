@@ -1,0 +1,46 @@
+# 依赖
+node_modules/
+.pnpm-store/
+
+# 构建产物
+dist/
+build/
+*.apk
+*.aab
+*.ap_
+*.dex
+*.hprof
+
+# Android / Gradle
+android/.gradle/
+android/build/
+android/app/build/
+android/capacitor-cordova-android-plugins/
+android/local.properties
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
+android/app/src/main/assets/capacitor.plugins.json
+.gradle/
+local.properties
+
+# 签名密钥与口令（绝不入库）
+keystore/
+*.jks
+*.keystore
+android/keystore.properties
+
+# 编辑器 / 系统
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
+.oxlintcache
+
+# 环境变量
+.env.*
+!.env.example
+tmp/
+
+# 自行打包的源码压缩包，不要入库
+*.zip

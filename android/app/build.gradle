@@ -1,0 +1,90 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace = "com.deepseek.web"
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "com.deepseek.web"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 2
+        versionName "2.0.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    packaging {
+        jniLibs {
+            // 必须解压到 lib 目录：proot 要被 exec，不能只留在 APK 里
+            useLegacyPackaging = true
+        }
+    }
+    // 正式签名口令：android/keystore.properties（已被 git 忽略）
+    // 若有环境变量 RELEASE_STORE_PASSWORD 则优先使用，便于 CI 注入
+    def keystorePropsFile = rootProject.file("../android/keystore.properties")
+    def keystoreProps = new Properties()
+    if (keystorePropsFile.exists()) {
+        keystorePropsFile.withInputStream { keystoreProps.load(it) }
+    }
+    def releaseStorePassword = System.getenv("RELEASE_STORE_PASSWORD") ?: keystoreProps.getProperty("STORE_PASSWORD")
+    def releaseKeyAlias = System.getenv("RELEASE_KEY_ALIAS") ?: keystoreProps.getProperty("KEY_ALIAS") ?: "deepseekweb"
+    def releaseKeyPassword = System.getenv("RELEASE_KEY_PASSWORD") ?: keystoreProps.getProperty("KEY_PASSWORD") ?: releaseStorePassword
+
+    // 正式签名：优先环境变量，其次 android/keystore.properties。
+    // 两者都没有时不报错，release 产出未签名包，方便他人 clone 后直接构建。
+    def hasReleaseSigning = releaseStorePassword && rootProject.file("../keystore/release.jks").exists()
+    signingConfigs {
+        if (hasReleaseSigning) {
+            releaseSign {
+                storeFile rootProject.file("../keystore/release.jks")
+                storePassword releaseStorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
+            }
+        }
+    }
+    buildTypes {
+        release {
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.releaseSign
+            } else {
+                logger.warn("[signing] 未提供正式签名密钥或口令，release APK 将不签名（assembleDebug 不受影响）")
+            }
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    implementation project(':terminal-view')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}

@@ -1,0 +1,9 @@
+include ':app'
+include ':terminal-emulator'
+include ':terminal-view'
+include ':capacitor-cordova-android-plugins'
+project(':capacitor-cordova-android-plugins').projectDir = new File('./capacitor-cordova-android-plugins/')
+project(':terminal-emulator').projectDir = new File('./termux/terminal-emulator/')
+project(':terminal-view').projectDir = new File('./termux/terminal-view/')
+
+apply from: 'capacitor.settings.gradle'

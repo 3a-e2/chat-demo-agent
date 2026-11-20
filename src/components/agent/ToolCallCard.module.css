@@ -1,0 +1,65 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0;
+  padding: 8px 0 8px 12px;
+  border-left: 2px solid var(--dsw-alias-border-l3);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.failed {
+  border-left-color: var(--dsw-alias-state-error-primary);
+}
+
+.head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.tool {
+  color: var(--dsw-alias-label-caption);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.command {
+  overflow: hidden;
+  color: var(--dsw-alias-label-primary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  color: var(--dsw-alias-label-tertiary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.failed .meta {
+  color: var(--dsw-alias-state-error-primary);
+}
+
+.note {
+  margin: 0;
+  color: var(--dsw-alias-label-tertiary);
+  font-size: 11px;
+}
+
+.output {
+  overflow-x: auto;
+  margin: 0;
+  color: var(--dsw-alias-label-secondary);
+  white-space: pre;
+}
+
+.truncated {
+  margin: 0;
+  color: var(--dsw-alias-label-caption);
+  font-size: 11px;
+}

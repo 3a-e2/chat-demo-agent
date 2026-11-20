@@ -1,0 +1,41 @@
+// Vendored from termux-app (https://github.com/termux/termux-app, GPLv3), module `terminal-emulator`.
+// Only the changes needed to build inside this app are applied: sdk versions come from the root
+// project, publishing/jitpack wiring is dropped, and the ABI list is trimmed.
+apply plugin: 'com.android.library'
+
+android {
+    namespace "com.termux.terminal"
+
+    compileSdk = rootProject.ext.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+
+        // libtermux.so ships prebuilt in src/main/jniLibs (extracted from the official
+        // termux-app v0.118.3 terminal-emulator AAR) so a local NDK is not required.
+        // To rebuild it from src/main/jni instead, run `./gradlew
+        // :termux:terminal-emulator:externalNativeBuildDebug` on a machine with the NDK
+        // and delete jniLibs.
+        ndk {
+            abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation "androidx.annotation:annotation:1.9.0"
+    testImplementation "junit:junit:4.13.2"
+}

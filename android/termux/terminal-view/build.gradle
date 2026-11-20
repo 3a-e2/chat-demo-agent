@@ -1,0 +1,31 @@
+// Vendored from termux-app (https://github.com/termux/termux-app, GPLv3), module `terminal-view`.
+// Sdk versions come from the root project and the publishing wiring is dropped.
+apply plugin: 'com.android.library'
+
+android {
+    namespace "com.termux.view"
+
+    compileSdk = rootProject.ext.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation "androidx.annotation:annotation:1.9.0"
+    api project(":terminal-emulator")
+}
